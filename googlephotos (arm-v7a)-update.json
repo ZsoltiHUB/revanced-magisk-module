@@ -1,6 +1,6 @@
 {
-  "version": "v7.37.0.782944147 (patches 5.31.2)",
-  "versionCode": 1,
-  "zipUrl": "https://github.com/ZsoltiHUB/revanced-magisk-module/releases/download/1/googlephotos-revanced-magisk-v7.37.0.782944147-arm-v7a.zip",
+  "version": "v7.40.0.790840830 (patches 5.33.0)",
+  "versionCode": 4,
+  "zipUrl": "https://github.com/ZsoltiHUB/revanced-magisk-module/releases/download/4/googlephotos-revanced-magisk-v7.40.0.790840830-arm-v7a.zip",
   "changelog": "https://raw.githubusercontent.com/ZsoltiHUB/revanced-magisk-module/update/build.md"
 }
