@@ -1,6 +1,6 @@
 {
-  "version": "v9.0.76.1115 (patches 5.40.0)",
-  "versionCode": 13,
-  "zipUrl": "https://github.com/ZsoltiHUB/revanced-magisk-module/releases/download/13/spotify-revanced-magisk-v9.0.76.1115-all.zip",
+  "version": "v9.0.76.1115 (patches 5.41.0)",
+  "versionCode": 14,
+  "zipUrl": "https://github.com/ZsoltiHUB/revanced-magisk-module/releases/download/14/spotify-revanced-magisk-v9.0.76.1115-all.zip",
   "changelog": "https://raw.githubusercontent.com/ZsoltiHUB/revanced-magisk-module/update/build.md"
 }
