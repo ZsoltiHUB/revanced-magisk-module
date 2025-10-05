@@ -9,6 +9,7 @@ parallel-jobs = 1
 [YouTube]
 enabled = true
 build-mode = "apk"
+arch = "arm64-v8a"
 included-patches = "'Hide ads' 'Video ads' 'Change header' 'Hide end screen suggested video' 'Exit fullscreen mode' 'Open videos fullscreen' 'Return YouTube Dislike' 'SponsorBlock' 'Theme' 'GmsCore support' 'Spoof video streams' 'Video quality'"
 exclusive-patches = true
 version = "auto"
