@@ -7,10 +7,10 @@ parallel-jobs = 1
 # you can use rvmm-config-gen to generate a config
 
 [YouTube]
-enabled = false
-build-mode = "module"
-excluded-patches = ""
-included-patches = ""
+enabled = true
+build-mode = "apk"
+included-patches = "'Hide ads' 'Video ads' 'Change header' 'Hide end screen suggested video' 'Exit fullscreen mode' 'Open videos fullscreen' 'Return YouTube Dislike' 'SponsorBlock' 'Theme' 'GmsCore support' 'Spoof video streams' 'Video quality'"
+exclusive-patches = true
 version = "auto"
 apkmirror-dlurl = "https://www.apkmirror.com/apk/google-inc/youtube"
 uptodown-dlurl = "https://youtube.en.uptodown.com/android"
