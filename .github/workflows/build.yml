@@ -62,7 +62,8 @@ jobs:
           
           # Extract app versions for release title
           # Matches lines like "AppName: version" where version starts with a digit
-          APP_VERSIONS=$(awk '/^[A-Za-z][A-Za-z0-9]*:[[:space:]]*[0-9]/ {gsub(/:[[:space:]]*/, " "); gsub(/[[:space:]]+$/, ""); print} /^$/ {exit}' build.md | tr '\n' ',' | sed 's/,/, /g; s/, $//')
+          # Supports app names with spaces, hyphens, underscores, and parentheses
+          APP_VERSIONS=$(awk '/^[A-Za-z][A-Za-z0-9 _()-]*:[[:space:]]*[0-9]/ {gsub(/:[[:space:]]*/, " "); gsub(/[[:space:]]+$/, ""); print} /^$/ {exit}' build.md | tr '\n' ',' | sed 's/,/, /g; s/, $//')
           if [ -n "$APP_VERSIONS" ]; then
             echo "RELEASE_TITLE=$APP_VERSIONS" >> "$GITHUB_OUTPUT"
           else
