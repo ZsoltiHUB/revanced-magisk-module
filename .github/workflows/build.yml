@@ -61,7 +61,8 @@ jobs:
           cp -f build.md build.tmp
           
           # Extract app versions for release title
-          APP_VERSIONS=$(awk '/^[A-Za-z].*:/ {gsub(/:[[:space:]]*/, " "); gsub(/[[:space:]]+$/, ""); print} /^$/ {exit}' build.md | tr '\n' ',' | sed 's/,/, /g; s/, $//')
+          # Matches lines like "AppName: version" where version starts with a digit
+          APP_VERSIONS=$(awk '/^[A-Za-z][A-Za-z0-9]*:[[:space:]]*[0-9]/ {gsub(/:[[:space:]]*/, " "); gsub(/[[:space:]]+$/, ""); print} /^$/ {exit}' build.md | tr '\n' ',' | sed 's/,/, /g; s/, $//')
           if [ -n "$APP_VERSIONS" ]; then
             echo "RELEASE_TITLE=$APP_VERSIONS" >> "$GITHUB_OUTPUT"
           else
