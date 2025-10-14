@@ -59,6 +59,29 @@ jobs:
           cat build.md >> "$GITHUB_OUTPUT"
           echo "${DELIM}" >> "$GITHUB_OUTPUT"
           cp -f build.md build.tmp
+          
+          # Extract app versions for release title
+          VERSIONS=""
+          while IFS= read -r line; do
+            # Match lines with format "AppName: Version" - must have colon and version-like string
+            if [[ "$line" =~ ^([^:]+):[[:space:]]+([0-9]+[0-9.]*[0-9]+|[0-9]+)$ ]]; then
+              app="${BASH_REMATCH[1]}"
+              version="${BASH_REMATCH[2]}"
+              # Add to versions list
+              if [ -z "$VERSIONS" ]; then
+                VERSIONS="${app} ${version}"
+              else
+                VERSIONS="${VERSIONS}, ${app} ${version}"
+              fi
+            fi
+          done < build.md
+          
+          if [ -n "$VERSIONS" ]; then
+            RELEASE_TITLE="ReVanced - ${VERSIONS}"
+          else
+            RELEASE_TITLE="ReVanced"
+          fi
+          echo "RELEASE_TITLE=${RELEASE_TITLE}" >> "$GITHUB_OUTPUT"
 
       - name: Upload modules to release
         uses: svenstaro/upload-release-action@v2
@@ -66,7 +89,7 @@ jobs:
           body: ${{ steps.get_output.outputs.BUILD_LOG }}
           repo_token: ${{ secrets.GITHUB_TOKEN }}
           file: ./build/*
-          release_name: ReVanced
+          release_name: ${{ steps.get_output.outputs.RELEASE_TITLE }}
           tag: ${{ steps.next_ver_code.outputs.NEXT_VER_CODE }}
           file_glob: true
           overwrite: true
