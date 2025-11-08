@@ -52,8 +52,7 @@ apkmirror-dlurl = "https://www.apkmirror.com/apk/google-inc/youtube-music"
 [YouTube-Extended]
 enabled = true
 app-name = "RVX"
-patches-source = "inotia00/revanced-patches"
-cli-source = "inotia00/revanced-cli"
+patches-source = "anddea/revanced-patches"
 rv-brand = "ReVanced Extended"
 build-mode = "apk"
 apkmirror-dlurl = "https://www.apkmirror.com/apk/google-inc/youtube"
