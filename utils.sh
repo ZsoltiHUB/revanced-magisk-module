@@ -69,6 +69,8 @@ get_rv_prebuilts() {
 		elif [ "$ver" = "latest" ]; then
 			rv_rel+="/latest"
 			name_ver="*"
+		elif [ "$ver" = "prerelease" ]; then
+			name_ver="*"
 		else
 			rv_rel+="/tags/${ver}"
 			name_ver="$ver"
@@ -79,7 +81,11 @@ get_rv_prebuilts() {
 		if [ -z "$file" ]; then
 			local resp asset name
 			resp=$(gh_req "$rv_rel" -) || return 1
-			if [ "$ver" = "dev" ]; then resp=$(jq -r '.[0]' <<<"$resp"); fi
+			if [ "$ver" = "dev" ]; then
+				resp=$(jq -r '.[0]' <<<"$resp")
+			elif [ "$ver" = "prerelease" ]; then
+				resp=$(jq -r '[.[] | select(.prerelease == true)][0] // .[0]' <<<"$resp")
+			fi
 			tag_name=$(jq -r '.tag_name' <<<"$resp")
 			asset=$(jq -e -r ".assets[] | select(.name | endswith(\"$ext\"))" <<<"$resp") || return 1
 			url=$(jq -r .url <<<"$asset")
@@ -90,7 +96,7 @@ get_rv_prebuilts() {
 		else
 			grab_cl=false
 			local for_err=$file
-			if [ "$ver" = "latest" ]; then
+			if [ "$ver" = "latest" ] || [ "$ver" = "prerelease" ]; then
 				file=$(grep -v '/[^/]*dev[^/]*$' <<<"$file" | head -1)
 			else file=$(grep "/[^/]*${ver#v}[^/]*\$" <<<"$file" | head -1); fi
 			if [ -z "$file" ]; then abort "filter fail: '$for_err' with '$ver'"; fi
@@ -152,6 +158,8 @@ config_update() {
 				last_patches=$(gh_req "$rv_rel" - | jq -e -r '.[0]')
 			elif [ "$PATCHES_VER" = "latest" ]; then
 				last_patches=$(gh_req "$rv_rel/latest" -)
+			elif [ "$PATCHES_VER" = "prerelease" ]; then
+				last_patches=$(gh_req "$rv_rel" - | jq -e -r '[.[] | select(.prerelease == true)][0] // .[0]')
 			else
 				last_patches=$(gh_req "$rv_rel/tags/${ver}" -)
 			fi
