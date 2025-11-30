@@ -161,7 +161,7 @@ config_update() {
 			elif [ "$PATCHES_VER" = "prerelease" ]; then
 				last_patches=$(gh_req "$rv_rel" - | jq -e -r '[.[] | select(.prerelease == true)][0] // .[0]')
 			else
-				last_patches=$(gh_req "$rv_rel/tags/${ver}" -)
+				last_patches=$(gh_req "$rv_rel/tags/${PATCHES_VER}" -)
 			fi
 			if ! last_patches=$(jq -e -r '.assets[] | select(.name | endswith("rvp")) | .name' <<<"$last_patches"); then
 				abort oops
