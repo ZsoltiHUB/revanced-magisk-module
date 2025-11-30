@@ -39,7 +39,7 @@ uptodown-dlurl = "https://google-photos.en.uptodown.com/android"
 [Music-Extended]
 enabled = "true"
 app-name = "YT Music"
-patches-source = "anddea/revanced-patches"
+patches-source = "inotia00/revanced-patches"
 patches-version = "dev"
 rv-brand = "ReVanced Extended"
 build-mode = "apk"
