@@ -41,6 +41,11 @@ enabled = "true"
 app-name = "YT Music"
 patches-source = "inotia00/revanced-patches"
 patches-version = "dev"
+excluded-patches = """\
+  'Custom branding icon for YouTube Music' \
+  'Custom branding name for YouTube Music' \
+  'Dark theme' \
+  """
 rv-brand = "ReVanced Extended"
 build-mode = "apk"
 arch = "arm64-v8a"
