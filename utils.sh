@@ -550,6 +550,9 @@ build_rv() {
 	microg_patch=$(grep "^Name: " <<<"$list_patches" | grep -i "gmscore\|microg" || :) microg_patch=${microg_patch#*: }
 	if [ -n "$microg_patch" ] && [[ ${p_patcher_args[*]} =~ $microg_patch ]]; then
 		epr "You cant include/exclude microg patch as that's done by rvmm builder automatically."
+		# Remove microg patch with various quoting styles: -e 'patch', -e "patch", -e patch
+		p_patcher_args=("${p_patcher_args[@]//-[ei] \'${microg_patch}\'/}")
+		p_patcher_args=("${p_patcher_args[@]//-[ei] \"${microg_patch}\"/}")
 		p_patcher_args=("${p_patcher_args[@]//-[ei] ${microg_patch}/}")
 	fi
 	for build_mode in "${build_mode_arr[@]}"; do
