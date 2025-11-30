@@ -1,6 +1,5 @@
 GooglePhotos: 7.55.0.835314738  
 Music-Extended: 8.30.54  
-Reddit: 2024.17.0  
 YouTube: 20.14.43  
 YouTube-Extended: 20.05.46  
 
