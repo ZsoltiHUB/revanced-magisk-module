@@ -24,6 +24,7 @@ arch = "arm64-v8a"
 version = "auto"
 apkmirror-dlurl = "https://www.apkmirror.com/apk/google-inc/photos/"
 uptodown-dlurl = "https://google-photos.en.uptodown.com/android"
+archive-dlurl = "https://archive.org/download/jhc-apks/apks/com.google.android.apps.photos"
 
 # https://github.com/j-hc/revanced-magisk-module/issues/554
 [Music-Extended]
@@ -40,6 +41,8 @@ rv-brand = "ReVanced Extended"
 build-mode = "apk"
 arch = "arm64-v8a"
 apkmirror-dlurl = "https://www.apkmirror.com/apk/google-inc/youtube-music"
+uptodown-dlurl = "https://youtube-music.en.uptodown.com/android"
+archive-dlurl = "https://archive.org/download/jhc-apks/apks/com.google.android.apps.youtube.music"
 patcher-args = "-e 'GmsCore support' -OpackageNameYouTubeMusic=com.google.android.apps.youtube.music"
 
 [YouTube-Extended]
@@ -51,6 +54,8 @@ rv-brand = "ReVanced Extended"
 build-mode = "apk"
 arch = "arm64-v8a"
 apkmirror-dlurl = "https://www.apkmirror.com/apk/google-inc/youtube"
+uptodown-dlurl = "https://youtube.en.uptodown.com/android"
+archive-dlurl = "https://archive.org/download/jhc-apks/apks/com.google.android.youtube"
 
 [Reddit]
 enabled = true
@@ -60,12 +65,15 @@ rv-brand = "ReVanced Extended"
 build-mode = "apk"
 arch = "arm64-v8a"
 apkmirror-dlurl = "https://apkmirror.com/apk/redditinc/reddit/"
+uptodown-dlurl = "https://reddit-official-app.en.uptodown.com/android"
+archive-dlurl = "https://archive.org/download/jhc-apks/apks/com.reddit.frontpage"
 
 [Messenger]
 enabled = true
 build-mode = "apk"
 arch = "arm64-v8a"
 apkmirror-dlurl = "https://apkmirror.com/apk/facebook-2/messenger/"
+uptodown-dlurl = "https://facebook-messenger.en.uptodown.com/android"
 
 [Music]
 enabled = false
