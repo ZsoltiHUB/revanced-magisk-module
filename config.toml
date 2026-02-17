@@ -30,18 +30,18 @@ archive-dlurl = "https://archive.org/download/jhc-apks/apks/com.google.android.a
 [Music-Extended]
 enabled = "true"
 app-name = "YT Music"
-patches-source = "inotia00/revanced-patches"
+patches-source = "MorpheApp/morphe-patches"
 patches-version = "dev"
 excluded-patches = """\
   'Custom branding icon for YouTube Music' \
   'Custom branding name for YouTube Music' \
   'Dark theme' \
   """
-rv-brand = "ReVanced Extended"
+cli-source = "MorpheApp/morphe-cli"
 build-mode = "apk"
 arch = "arm64-v8a"
-apkmirror-dlurl = "https://www.apkmirror.com/apk/google-inc/youtube-music"
 uptodown-dlurl = "https://youtube-music.en.uptodown.com/android"
+apkmirror-dlurl = "https://www.apkmirror.com/apk/google-inc/youtube-music"
 archive-dlurl = "https://archive.org/download/jhc-apks/apks/com.google.android.apps.youtube.music"
 patcher-args = "-e 'GmsCore support' -OpackageNameYouTubeMusic=com.google.android.apps.youtube.music"
 
