@@ -9,6 +9,7 @@ dpi = "nodpi anydpi 120-640dpi"
 
 [YouTube]
 enabled = true
+patches-version = "latest"
 build-mode = "apk"
 arch = "arm64-v8a"
 included-patches = "'Hide ads' 'Video ads' 'Remove viewer discretion dialog' 'Change header' 'Hide video action buttons' 'Navigation buttons' 'Hide player overlay buttons' 'Hide end screen suggested video' 'Hide layout components' 'Hide player flyout menu items' 'Hide Shorts components' 'Disable sign in to TV popup' 'Exit fullscreen mode' 'Open videos fullscreen' 'Return YouTube Dislike' 'SponsorBlock' 'Disable resuming Shorts on startup' 'Theme' 'Remove background playback restrictions' 'GmsCore support' 'Bypass URL redirects' 'Open links externally' 'Loop video' 'Spoof video streams' 'Video quality' 'Playback speed'"
@@ -66,6 +67,7 @@ apkmirror-dlurl = "https://www.apkmirror.com/apk/redditinc/reddit/"
 
 [Messenger]
 enabled = true
+patches-version = "latest"
 build-mode = "apk"
 arch = "arm64-v8a"
 excluded-patches = "'Disable typing indicator'"
