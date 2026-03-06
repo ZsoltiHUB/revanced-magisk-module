@@ -493,6 +493,47 @@ patch_apk() {
 	fi
 }
 
+# Fix native library compression in APK.
+# Some patchers (e.g. morphe-cli with ARSCLib) compress .so files during rebuild,
+# which breaks apps that use extractNativeLibs="false" in their manifest.
+# This function ensures .so files are stored uncompressed and page-aligned.
+fix_apk_native_libs() {
+	local apk="$1"
+
+	# Check if APK has any compressed .so files (Defl: = deflated/compressed)
+	if ! unzip -v "$apk" "lib/*.so" 2>/dev/null | grep -q "Defl:"; then
+		return 0
+	fi
+
+	pr "Fixing compressed native libraries"
+	local tmpdir
+	tmpdir=$(mktemp -d -p "$TEMP_DIR")
+
+	# Extract native libs, remove from APK, re-add as stored (uncompressed)
+	unzip -qo "$apk" "lib/*" -d "$tmpdir"
+	zip -d "$apk" "lib/*" >/dev/null 2>&1 || :
+	(cd "$tmpdir" && zip -0 "${CWD}/$apk" $(find lib -name "*.so" -type f))
+
+	# Page-align using zipalign if available (required for extractNativeLibs="false")
+	local zipalign_bin=""
+	if command -v zipalign &>/dev/null; then
+		zipalign_bin="zipalign"
+	elif [ -n "${ANDROID_HOME-}" ]; then
+		zipalign_bin=$(find "${ANDROID_HOME}/build-tools" -name zipalign -type f 2>/dev/null | sort -V | tail -1)
+	fi
+	if [ -n "$zipalign_bin" ]; then
+		"$zipalign_bin" -p -f 4 "$apk" "${apk}.aligned"
+		mv -f "${apk}.aligned" "$apk"
+	fi
+
+	# Re-sign since we modified the APK after the patcher signed it
+	java -jar --enable-native-access=ALL-UNNAMED "$APKSIGNER" sign \
+		--ks ks.keystore --ks-pass pass:123456789 \
+		--ks-key-alias jhc --key-pass pass:123456789 "$apk"
+
+	rm -rf "$tmpdir"
+}
+
 check_sig() {
 	local file=$1 pkg_name=$2
 	local sig
@@ -650,6 +691,7 @@ build_rv() {
 		fi
 		rm "$stock_apk_to_patch"
 		if [ "$build_mode" = apk ]; then
+			fix_apk_native_libs "$patched_apk"
 			local apk_output="${BUILD_DIR}/${app_name_l}-${rv_brand_f}-v${version_f}-${arch_f}.apk"
 			mv -f "$patched_apk" "$apk_output"
 			pr "Built ${table} (non-root): '${apk_output}'"
