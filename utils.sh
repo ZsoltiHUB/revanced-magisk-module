@@ -498,7 +498,7 @@ patch_apk() {
 # which breaks apps that use extractNativeLibs="false" in their manifest.
 # This function ensures .so files are stored uncompressed and page-aligned.
 fix_apk_native_libs() {
-	local apk="$1"
+	local apk="$1" cli_jar="$2"
 
 	# Check if APK has any compressed .so files (Defl: = deflated/compressed)
 	if ! unzip -v "$apk" "lib/*.so" 2>/dev/null | grep -q "Defl:"; then
@@ -526,15 +526,40 @@ fix_apk_native_libs() {
 		mv -f "${apk}.aligned" "$apk"
 	fi
 
-	# Re-sign since we modified the APK after the patcher signed it.
-	# The patcher's ks.keystore uses BouncyCastle PKCS12 format which is
-	# incompatible with apksigner.jar's standard Java PKCS12 loader.
-	# So we create a separate standard keystore for re-signing.
-	local resign_ks="${TEMP_DIR}/resign.keystore"
-	if [ ! -f "$resign_ks" ]; then
-		keytool -genkeypair -keystore "$resign_ks" -storetype PKCS12 \
-			-storepass 123456789 -keypass 123456789 -alias resign \
-			-keyalg RSA -keysize 2048 -validity 10000 -dname "CN=resign" 2>/dev/null
+	# Re-sign with the SAME key from ks.keystore to preserve update compatibility.
+	# The patcher creates ks.keystore in BouncyCastle format which standard Java
+	# cannot read. We convert it to standard PKCS12 using BouncyCastle from the
+	# patcher's CLI jar, so we re-sign with the exact same key/certificate.
+	local converted_ks="${TEMP_DIR}/ks_converted.keystore"
+	if [ ! -f "$converted_ks" ] && [ -f ks.keystore ]; then
+		local src_type
+		for src_type in PKCS12 BKS; do
+			if keytool -importkeystore \
+				-srckeystore ks.keystore -srcstoretype "$src_type" -srcstorepass 123456789 \
+				-srcprovidername BC \
+				-destkeystore "$converted_ks" -deststoretype PKCS12 -deststorepass 123456789 \
+				-providerpath "$cli_jar" \
+				-providerclass org.bouncycastle.jce.provider.BouncyCastleProvider \
+				-noprompt 2>/dev/null; then
+				break
+			fi
+			rm -f "$converted_ks"
+		done
+	fi
+
+	local sign_ks sign_alias
+	if [ -f "$converted_ks" ]; then
+		sign_ks="$converted_ks"
+		sign_alias="jhc"
+	else
+		epr "WARNING: Could not convert keystore - signature will change!"
+		sign_ks="${TEMP_DIR}/resign.keystore"
+		sign_alias="resign"
+		if [ ! -f "$sign_ks" ]; then
+			keytool -genkeypair -keystore "$sign_ks" -storetype PKCS12 \
+				-storepass 123456789 -keypass 123456789 -alias resign \
+				-keyalg RSA -keysize 2048 -validity 10000 -dname "CN=resign" 2>/dev/null
+		fi
 	fi
 
 	# Try Android SDK's apksigner first (on CI), fall back to bundled jar
@@ -543,12 +568,12 @@ fix_apk_native_libs() {
 		sdk_apksigner=$(find "${ANDROID_HOME}/build-tools" -name apksigner -type f 2>/dev/null | sort -V | tail -1)
 	fi
 	if [ -n "$sdk_apksigner" ]; then
-		"$sdk_apksigner" sign --ks "$resign_ks" --ks-pass pass:123456789 \
-			--ks-key-alias resign --key-pass pass:123456789 "$apk"
+		"$sdk_apksigner" sign --ks "$sign_ks" --ks-pass pass:123456789 \
+			--ks-key-alias "$sign_alias" --key-pass pass:123456789 "$apk"
 	else
 		java -jar --enable-native-access=ALL-UNNAMED "$APKSIGNER" sign \
-			--ks "$resign_ks" --ks-pass pass:123456789 \
-			--ks-key-alias resign --key-pass pass:123456789 "$apk"
+			--ks "$sign_ks" --ks-pass pass:123456789 \
+			--ks-key-alias "$sign_alias" --key-pass pass:123456789 "$apk"
 	fi
 
 	rm -rf "$tmpdir"
@@ -711,7 +736,7 @@ build_rv() {
 		fi
 		rm "$stock_apk_to_patch"
 		if [ "$build_mode" = apk ]; then
-			fix_apk_native_libs "$patched_apk"
+			fix_apk_native_libs "$patched_apk" "${args[cli]}"
 			local apk_output="${BUILD_DIR}/${app_name_l}-${rv_brand_f}-v${version_f}-${arch_f}.apk"
 			mv -f "$patched_apk" "$apk_output"
 			pr "Built ${table} (non-root): '${apk_output}'"
