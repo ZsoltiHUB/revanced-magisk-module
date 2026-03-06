@@ -55,6 +55,14 @@ for file in "$TEMP_DIR"/*/changelog.md; do
 	[ -f "$file" ] && : >"$file"
 done
 
+# Create a standard PKCS12 keystore before patching starts.
+# This ensures compatibility with both the patcher CLI and apksigner.jar for re-signing.
+if [ ! -f ks.keystore ]; then
+	keytool -genkeypair -keystore ks.keystore -storetype PKCS12 \
+		-storepass 123456789 -keypass 123456789 -alias jhc \
+		-keyalg RSA -keysize 2048 -validity 10000 -dname "CN=jhc" 2>/dev/null
+fi
+
 mkdir -p ${MODULE_TEMPLATE_DIR}/bin/arm64 ${MODULE_TEMPLATE_DIR}/bin/arm ${MODULE_TEMPLATE_DIR}/bin/x86 ${MODULE_TEMPLATE_DIR}/bin/x64
 gh_dl "${MODULE_TEMPLATE_DIR}/bin/arm64/cmpr" "https://github.com/j-hc/cmpr/releases/latest/download/cmpr-arm64-v8a"
 gh_dl "${MODULE_TEMPLATE_DIR}/bin/arm/cmpr" "https://github.com/j-hc/cmpr/releases/latest/download/cmpr-armeabi-v7a"
