@@ -526,10 +526,30 @@ fix_apk_native_libs() {
 		mv -f "${apk}.aligned" "$apk"
 	fi
 
-	# Re-sign since we modified the APK after the patcher signed it
-	java -jar --enable-native-access=ALL-UNNAMED "$APKSIGNER" sign \
-		--ks ks.keystore --ks-pass pass:123456789 \
-		--ks-key-alias jhc --key-pass pass:123456789 "$apk"
+	# Re-sign since we modified the APK after the patcher signed it.
+	# The patcher's ks.keystore uses BouncyCastle PKCS12 format which is
+	# incompatible with apksigner.jar's standard Java PKCS12 loader.
+	# So we create a separate standard keystore for re-signing.
+	local resign_ks="${TEMP_DIR}/resign.keystore"
+	if [ ! -f "$resign_ks" ]; then
+		keytool -genkeypair -keystore "$resign_ks" -storetype PKCS12 \
+			-storepass 123456789 -keypass 123456789 -alias resign \
+			-keyalg RSA -keysize 2048 -validity 10000 -dname "CN=resign" 2>/dev/null
+	fi
+
+	# Try Android SDK's apksigner first (on CI), fall back to bundled jar
+	local sdk_apksigner=""
+	if [ -n "${ANDROID_HOME-}" ]; then
+		sdk_apksigner=$(find "${ANDROID_HOME}/build-tools" -name apksigner -type f 2>/dev/null | sort -V | tail -1)
+	fi
+	if [ -n "$sdk_apksigner" ]; then
+		"$sdk_apksigner" sign --ks "$resign_ks" --ks-pass pass:123456789 \
+			--ks-key-alias resign --key-pass pass:123456789 "$apk"
+	else
+		java -jar --enable-native-access=ALL-UNNAMED "$APKSIGNER" sign \
+			--ks "$resign_ks" --ks-pass pass:123456789 \
+			--ks-key-alias resign --key-pass pass:123456789 "$apk"
+	fi
 
 	rm -rf "$tmpdir"
 }
