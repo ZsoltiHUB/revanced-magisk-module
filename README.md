@@ -26,7 +26,7 @@ Use [**zygisk-detach**](https://github.com/j-hc/zygisk-detach) to detach YouTube
 </details>
 
 ## ReVanced config
-```console
+```json
 "disable_resuming_shorts_player": true,
 "disable_signin_to_tv_popup": true,
 "gradient_loading_screen": true,
