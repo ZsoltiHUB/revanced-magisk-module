@@ -35,6 +35,7 @@ Use [**zygisk-detach**](https://github.com/j-hc/zygisk-detach) to detach YouTube
 "gradient_loading_screen": true,
 "header_logo": "premium",
 "hide_ask_section": true,
+"hide_clip_button": true,
 "hide_create_button": true,
 "hide_download_button": true,
 "hide_explore_section": true,
