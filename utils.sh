@@ -50,6 +50,13 @@ abort() {
 }
 java() { env -i java "$@"; }
 
+# Detect CLI type from jar filename: rv5 (ReVanced stable), rv6 (ReVanced v6+), or morphe
+get_cli_type() {
+	if [[ "$1" == *morphe* ]]; then echo morphe
+	elif [[ "$(basename "$1")" =~ cli-([0-9]+)\. ]] && (( BASH_REMATCH[1] >= 6 )); then echo rv6
+	else echo rv5; fi
+}
+
 get_prebuilts() {
 	local cli_src=$1 cli_ver=$2 patches_src=$3 patches_ver=$4
 	pr "Getting prebuilts (${patches_src%/*})" >&2
@@ -263,11 +270,19 @@ get_patch_last_supported_ver() {
 			return
 		fi
 	fi
-	op=$(java -jar "$cli_jar" list-versions "$patches_jar" -f "$pkg_name" 2>&1 | tail -n +3 | awk '{$1=$1}1')
+	if [[ $(get_cli_type "$cli_jar") == rv6 ]]; then
+		op=$(java -jar "$cli_jar" list-versions -bp "$patches_jar" -f "$pkg_name" 2>&1 | tail -n +3 | awk '{$1=$1}1')
+	else
+		op=$(java -jar "$cli_jar" list-versions "$patches_jar" -f "$pkg_name" 2>&1 | tail -n +3 | awk '{$1=$1}1')
+	fi
 	if [ "$op" = "Any" ]; then return; fi
 	pcount=$(head -1 <<<"$op") pcount=${pcount#*(} pcount=${pcount% *}
 	if [ -z "$pcount" ]; then
-		av_apps=$(java -jar "$cli_jar" list-versions "$patches_jar" 2>&1 | awk '/Package name:/ { printf "%s\x27%s\x27", sep, $NF; sep=", " } END { print "" }')
+		if [[ $(get_cli_type "$cli_jar") == rv6 ]]; then
+			av_apps=$(java -jar "$cli_jar" list-versions -bp "$patches_jar" 2>&1 | awk '/Package name:/ { printf "%s\x27%s\x27", sep, $NF; sep=", " } END { print "" }')
+		else
+			av_apps=$(java -jar "$cli_jar" list-versions "$patches_jar" 2>&1 | awk '/Package name:/ { printf "%s\x27%s\x27", sep, $NF; sep=", " } END { print "" }')
+		fi
 		abort "No patch versions found for '$pkg_name' in this patches source!\nAvailable applications found: $av_apps"
 	fi
 	grep -F "($pcount patch" <<<"$op" | sed 's/ (.* patch.*//' | get_highest_ver || return 1
@@ -483,7 +498,9 @@ get_direct_resp() { __DIRECT_APKNAME__=$(awk -F/ '{print $NF}' <<<"$1"); }
 
 patch_apk() {
 	local stock_input=$1 patched_apk=$2 patcher_args=$3 cli_jar=$4 patches_jar=$5
-	local cmd="java -jar '$cli_jar' patch '$stock_input' --purge -o '$patched_apk' -p '$patches_jar' --keystore=ks.keystore \
+	local pflag="-p"
+	if [[ $(get_cli_type "$cli_jar") == rv6 ]]; then pflag="-bp"; fi
+	local cmd="java -jar '$cli_jar' patch '$stock_input' --purge -o '$patched_apk' ${pflag} '$patches_jar' --keystore=ks.keystore \
 --keystore-entry-password=123456789 --keystore-password=123456789 --signer=jhc --keystore-entry-alias=jhc $patcher_args"
 	if [ "$OS" = Android ]; then cmd+=" --custom-aapt2-binary='${AAPT2}'"; fi
 	pr "$cmd"
@@ -623,7 +640,12 @@ build_rv() {
 		return 0
 	fi
 	local list_patches
-	list_patches=$(java -jar "$cli_jar" list-patches --patches "$patches_jar" -f "$pkg_name" -v -p 2>&1)
+	# CLI-specific list-patches flags (v5 positional, v6 named+bypass, morphe named)
+	case $(get_cli_type "$cli_jar") in
+		rv6)    list_patches=$(java -jar "$cli_jar" list-patches -bp "$patches_jar" --filter-package-name "$pkg_name" --versions --packages 2>&1) ;;
+		morphe) list_patches=$(java -jar "$cli_jar" list-patches --patches "$patches_jar" -f "$pkg_name" -v -p 2>&1) ;;
+		*)      list_patches=$(java -jar "$cli_jar" list-patches "$patches_jar" -f "$pkg_name" -v -p 2>&1) ;;
+	esac
 
 	local get_latest_ver=false
 	if [ "$version_mode" = auto ]; then
