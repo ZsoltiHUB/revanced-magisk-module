@@ -29,6 +29,7 @@ Use [**zygisk-detach**](https://github.com/j-hc/zygisk-detach) to detach YouTube
 ```json
 "bypass_ambient_mode_restrictions": true,
 "copy_video_url_timestamp": false,
+"custom_branding_icon": "original",
 "disable_resuming_shorts_player": true,
 "disable_sign_in_to_tv_popup": true,
 "end_screen_suggested_video": true,
