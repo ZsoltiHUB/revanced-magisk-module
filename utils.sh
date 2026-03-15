@@ -92,17 +92,25 @@ get_prebuilts() {
 			name_ver="$ver"
 		fi
 
-		local url file tag_name name
+		local url file tag_name matches
 		file=$(find "$dir" -name "*${fprefix}-${name_ver#v}.*" -type f 2>/dev/null)
 		if [ -z "$file" ]; then
 			local resp asset name
 			resp=$(gh_req "$rv_rel" -) || return 1
 			tag_name=$(jq -r '.tag_name' <<<"$resp")
-			matches=$(jq -e '.assets | map(select(.name | endswith("asc") | not))' <<<"$resp")
+			matches=$(jq -e '.assets | map(select(.name | (endswith("asc") or endswith("json")) | not))' <<<"$resp")
+			if [ "$(jq 'length' <<<"$matches")" -gt 1 ]; then
+				local matches_new
+				matches_new=$(jq -e -r 'map(select(.name | contains("-dev") | not))' <<<"$matches")
+				if [ "$(jq 'length' <<<"$matches_new")" -eq 1 ]; then
+					matches=$matches_new
+				fi
+			fi
 			if [ "$(jq 'length' <<<"$matches")" -eq 0 ]; then
-				abort "No asset was found"
+				epr "No asset was found"
+				return 1
 			elif [ "$(jq 'length' <<<"$matches")" -ne 1 ]; then
-				wpr "More than 1 asset was found for this cli release. Falling back to the first one found..."
+				wpr "More than 1 asset was found for this release. Falling back to the first one found..."
 			fi
 			asset=$(jq -r ".[0]" <<<"$matches")
 			url=$(jq -r .url <<<"$asset")
@@ -270,22 +278,36 @@ get_patch_last_supported_ver() {
 			return
 		fi
 	fi
-	if [[ $(get_cli_type "$cli_jar") == rv6 ]]; then
-		op=$(java -jar "$cli_jar" list-versions -bp "$patches_jar" -f "$pkg_name" 2>&1 | tail -n +3 | awk '{$1=$1}1')
-	else
-		op=$(java -jar "$cli_jar" list-versions "$patches_jar" -f "$pkg_name" 2>&1 | tail -n +3 | awk '{$1=$1}1')
-	fi
+	op=$(patches_list_versions "$cli_jar" "$patches_jar" "$pkg_name") || return 1
+	op=$(tail -n +3 <<<"$op" | awk '{$1=$1}1')
 	if [ "$op" = "Any" ]; then return; fi
 	pcount=$(head -1 <<<"$op") pcount=${pcount#*(} pcount=${pcount% *}
 	if [ -z "$pcount" ]; then
-		if [[ $(get_cli_type "$cli_jar") == rv6 ]]; then
-			av_apps=$(java -jar "$cli_jar" list-versions -bp "$patches_jar" 2>&1 | awk '/Package name:/ { printf "%s\x27%s\x27", sep, $NF; sep=", " } END { print "" }')
-		else
-			av_apps=$(java -jar "$cli_jar" list-versions "$patches_jar" 2>&1 | awk '/Package name:/ { printf "%s\x27%s\x27", sep, $NF; sep=", " } END { print "" }')
-		fi
-		abort "No patch versions found for '$pkg_name' in this patches source!\nAvailable applications found: $av_apps"
+		abort "No patches found for '$pkg_name' in patches '$patches_jar'"
 	fi
 	grep -F "($pcount patch" <<<"$op" | sed 's/ (.* patch.*//' | get_highest_ver || return 1
+}
+
+patches_list_versions() {
+	local cli_jar=$1 patches_jar=$2 pkg_name=$3 op
+	if ! op=$(java -jar "$cli_jar" list-versions -p "$patches_jar" -f "$pkg_name" -b 2>&1); then
+		if ! op=$(java -jar "$cli_jar" list-versions "$patches_jar" -f "$pkg_name" 2>&1); then
+			epr "Could not list versions $cli_jar: '$op'"
+			return 1
+		fi
+	fi
+	echo "$op"
+}
+patches_list() {
+	local cli_jar=$1 patches_jar=$2 pkg_name=$3 op
+	if ! op=$(java -jar "$cli_jar" list-patches -p "$patches_jar" --filter-package-name "$pkg_name" --versions --packages -b 2>&1); then
+		if ! op=$(java -jar "$cli_jar" list-patches --patches "$patches_jar" -f "$pkg_name" --with-versions --with-packages 2>&1); then
+			epr "Could not get patches list $cli_jar: '$op'"
+			return 1
+		fi
+
+	fi
+	echo "$op"
 }
 
 isoneof() {
@@ -502,6 +524,12 @@ patch_apk() {
 	if [[ $(get_cli_type "$cli_jar") == rv6 ]]; then pflag="-bp"; fi
 	local cmd="java -jar '$cli_jar' patch '$stock_input' --purge -o '$patched_apk' ${pflag} '$patches_jar' --keystore=ks.keystore \
 --keystore-entry-password=123456789 --keystore-password=123456789 --signer=jhc --keystore-entry-alias=jhc $patcher_args"
+
+	# TODO: remove this later
+	local cli_name
+	cli_name=$(basename "$cli_jar")
+	if [ "${cli_name::8}" = revanced ]; then cmd+=" -b"; fi
+
 	if [ "$OS" = Android ]; then cmd+=" --custom-aapt2-binary='${AAPT2}'"; fi
 	pr "$cmd"
 	if eval "$cmd"; then [ -f "$patched_apk" ]; else
@@ -640,18 +668,13 @@ build_rv() {
 		return 0
 	fi
 	local list_patches
-	# CLI-specific list-patches flags (v5 positional, v6 named+bypass, morphe named)
-	case $(get_cli_type "$cli_jar") in
-		rv6)    list_patches=$(java -jar "$cli_jar" list-patches -bp "$patches_jar" --filter-package-name "$pkg_name" --versions --packages 2>&1) ;;
-		morphe) list_patches=$(java -jar "$cli_jar" list-patches --patches "$patches_jar" -f "$pkg_name" -v -p 2>&1) ;;
-		*)      list_patches=$(java -jar "$cli_jar" list-patches "$patches_jar" -f "$pkg_name" -v -p 2>&1) ;;
-	esac
-
+	list_patches=$(patches_list "$cli_jar" "$patches_jar" "$pkg_name") || return 1
 	local get_latest_ver=false
 	if [ "$version_mode" = auto ]; then
 		if ! version=$(get_patch_last_supported_ver "$list_patches" "$pkg_name" \
 			"${args[included_patches]}" "${args[excluded_patches]}" "${args[exclusive_patches]}"); then
-			exit 1
+			epr "get_patch_last_supported_ver failed '$list_patches'"
+			return
 		elif [ -z "$version" ]; then get_latest_ver=true; fi
 	elif isoneof "$version_mode" latest beta; then
 		get_latest_ver=true
@@ -709,7 +732,7 @@ build_rv() {
 	local microg_patch
 	microg_patch=$(grep "^Name: " <<<"$list_patches" | grep -i "gmscore\|microg" || :) microg_patch=${microg_patch#*: }
 	if [ -n "$microg_patch" ] && [[ ${p_patcher_args[*]} =~ $microg_patch ]]; then
-		epr "You cant include/exclude microg patch as that's done by rvmm builder automatically."
+		wpr "You cant include/exclude microg patch as that's done by rvmm builder automatically."
 		p_patcher_args=("${p_patcher_args[@]//-[ei] ${microg_patch}/}")
 	fi
 
@@ -720,7 +743,7 @@ build_rv() {
 	for build_mode in "${build_mode_arr[@]}"; do
 		patcher_args=("${p_patcher_args[@]}")
 		pr "Building '${table}' in '$build_mode' mode"
-		if [ -n "$microg_patch" ]; then
+		if [ -n "$microg_patch" ] || [ -f "${stock_apk}.apkm" ]; then
 			patched_apk="${TEMP_DIR}/${app_name_l}-${rv_brand_f}-${version_f}-${arch_f}-${build_mode}.apk"
 		else
 			patched_apk="${TEMP_DIR}/${app_name_l}-${rv_brand_f}-${version_f}-${arch_f}.apk"
