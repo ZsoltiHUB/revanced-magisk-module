@@ -1,4 +1,3 @@
-Instagram-Morphe: 423.0.0.47.66  
 YouTube-Extended: 20.05.46  
 
 Install [Microg](https://github.com/ReVanced/GmsCore/releases) for non-root YouTube and YT Music APKs  
@@ -6,12 +5,10 @@ Use [zygisk-detach](https://github.com/j-hc/zygisk-detach) to detach YouTube and
 
 [revanced-magisk-module](https://github.com/j-hc/revanced-magisk-module)
   
-Patches: anddea/patches-4.0.0-dev.13.mpp  
-[Changelog](https://github.com/anddea/revanced-patches/releases/tag/v4.0.0-dev.13)
-
 CLI: MorpheApp/morphe-cli-1.6.3-all.jar  
-Patches: crimera/patches-3.2.0-dev.2.mpp  
-[Changelog](https://github.com/crimera/piko/releases/tag/v3.2.0-dev.2)  
+Patches: anddea/patches-4.0.0-dev.13.mpp  
+[Changelog](https://github.com/anddea/revanced-patches/releases/tag/v4.0.0-dev.13)  
 
 Skipped:  
-Patches: MorpheApp/patches-1.22.0.mpp          
+Patches: crimera/patches-3.2.0-dev.2.mpp  
+Patches: MorpheApp/patches-1.22.0.mpp            
