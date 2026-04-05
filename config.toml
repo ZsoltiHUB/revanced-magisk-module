@@ -55,7 +55,7 @@ uptodown-dlurl = "https://youtube-music.en.uptodown.com/android"
 patcher-args = "-e 'Change package name' -OpackageName=com.google.android.apps.youtube.music"
 
 [YouTube-Extended]
-enabled = true
+enabled = false
 app-name = "RVX"
 patches-source = "anddea/revanced-patches"
 patches-version = "dev"
