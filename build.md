@@ -10,4 +10,4 @@ Patches: crimera/patches-3.2.0-dev.5.mpp
 [Changelog](https://github.com/crimera/piko/releases/tag/v3.2.0-dev.5)  
 
 Skipped:  
-Patches: MorpheApp/patches-1.23.0.mpp          
+Patches: MorpheApp/patches-1.23.0.mpp            
