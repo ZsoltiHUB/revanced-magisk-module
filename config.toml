@@ -31,6 +31,8 @@ archive-dlurl = "https://archive.org/download/jhc-apks/apks/com.google.android.y
 
 [GooglePhotos]
 enabled = true
+cli-source = "MorpheApp/morphe-cli"
+patches-source = "RookieEnough/De-ReVanced"
 cli-version = "latest"
 patches-version = "latest"
 build-mode = "apk"
@@ -81,6 +83,8 @@ apkmirror-dlurl = "https://www.apkmirror.com/apk/redditinc/reddit/"
 
 [Messenger]
 enabled = true
+cli-source = "MorpheApp/morphe-cli"
+patches-source = "RookieEnough/De-ReVanced"
 cli-version = "latest"
 patches-version = "latest"
 build-mode = "apk"
