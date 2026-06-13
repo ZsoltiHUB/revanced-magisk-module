@@ -7,18 +7,6 @@ dpi = "nodpi anydpi 120-640dpi"
 
 # you can use rvmm-config-gen to generate a config
 
-#[YouTube]
-#enabled = true
-#patches-version = "latest"
-#build-mode = "apk"
-#arch = "arm64-v8a"
-#included-patches = "'Hide ads' 'Video ads' 'Remove viewer discretion dialog' 'Change header' 'Hide video action buttons' 'Navigation buttons' 'Hide player overlay buttons' 'Hide end screen suggested video' 'Hide layout components' 'Hide player flyout menu items' 'Hide Shorts components' 'Disable sign in to TV popup' 'Exit fullscreen mode' 'Open videos fullscreen' 'Return YouTube Dislike' 'SponsorBlock' 'Disable resuming Shorts on startup' 'Theme' 'Remove background playback restrictions' 'GmsCore support' 'Bypass URL redirects' 'Open links externally' 'Loop video' 'Spoof video streams' 'Video quality' 'Playback speed'"
-#exclusive-patches = true
-#version = "auto"
-#archive-dlurl = "https://archive.org/download/jhc-apks/apks/com.google.android.youtube"
-#apkmirror-dlurl = "https://www.apkmirror.com/apk/google-inc/youtube/"
-#uptodown-dlurl = "https://youtube.en.uptodown.com/android"
-
 [YouTube-Morphe]
 app-name = "YouTube"
 patches-source = "MorpheApp/morphe-patches"
@@ -57,18 +45,6 @@ apkmirror-dlurl = "https://www.apkmirror.com/apk/google-inc/youtube-music"
 uptodown-dlurl = "https://youtube-music.en.uptodown.com/android"
 patcher-args = "-e 'Change package name' -OpackageName=com.google.android.apps.youtube.music"
 
-[YouTube-Extended]
-enabled = false
-app-name = "RVX"
-patches-source = "anddea/revanced-patches"
-patches-version = "dev"
-cli-source = "MorpheApp/morphe-cli"
-build-mode = "apk"
-arch = "arm64-v8a"
-archive-dlurl = "https://archive.org/download/jhc-apks/apks/com.google.android.youtube"
-apkmirror-dlurl = "https://www.apkmirror.com/apk/google-inc/youtube/"
-uptodown-dlurl = "https://youtube.en.uptodown.com/android"
-
 [Reddit-Morphe]
 enabled = true
 app-name = "Reddit"
@@ -81,6 +57,31 @@ arch = "all"
 archive-dlurl = "https://archive.org/download/jhc-apks/apks/com.reddit.frontpage"
 uptodown-dlurl = "https://reddit-official-app.en.uptodown.com/android"
 apkmirror-dlurl = "https://www.apkmirror.com/apk/redditinc/reddit/"
+
+[Instagram-Morphe]
+enabled = true
+rv-brand = "Morphe"
+patches-source = "crimera/piko"
+cli-source = "MorpheApp/morphe-cli"
+cli-version = "latest"
+patches-version = "dev"
+build-mode = "apk"
+arch = "arm64-v8a"
+archive-dlurl = "https://archive.org/download/com.instagram.android_430.0.0.53.80-383611190_1dpi_7feat_45a6560d23bc198d6c89d70"
+apkmirror-dlurl = "https://apkmirror.com/apk/instagram/instagram-instagram/"
+uptodown-dlurl = "https://instagram.en.uptodown.com/android"
+
+[CamScanner-Morphe]
+enabled = true
+rv-brand = "Morphe"
+patches-source = "hoo-dles/morphe-patches"
+cli-source = "MorpheApp/morphe-cli"
+cli-version = "latest"
+patches-version = "latest"
+build-mode = "apk"
+arch = "arm64-v8a"
+apkmirror-dlurl = "https://www.apkmirror.com/apk/intsig-pte/camscanner-phone-pdf-creator/"
+uptodown-dlurl = "https://camscanner-pdf-creator.en.uptodown.com/android"
 
 [Messenger]
 enabled = true
@@ -96,14 +97,26 @@ excluded-patches = "'Disable typing indicator'"
 apkmirror-dlurl = "https://apkmirror.com/apk/facebook-2/messenger/"
 uptodown-dlurl = "https://facebook-messenger.en.uptodown.com/android"
 
-[Instagram-Morphe]
-enabled = true
-rv-brand = "Morphe"
-patches-source = "crimera/piko"
-cli-source = "MorpheApp/morphe-cli"
-cli-version = "latest"
+[YouTube-Extended]
+enabled = false
+app-name = "RVX"
+patches-source = "anddea/revanced-patches"
 patches-version = "dev"
+cli-source = "MorpheApp/morphe-cli"
 build-mode = "apk"
 arch = "arm64-v8a"
-apkmirror-dlurl = "https://apkmirror.com/apk/instagram/instagram-instagram/"
-uptodown-dlurl = "https://instagram.en.uptodown.com/android"
+archive-dlurl = "https://archive.org/download/jhc-apks/apks/com.google.android.youtube"
+apkmirror-dlurl = "https://www.apkmirror.com/apk/google-inc/youtube/"
+uptodown-dlurl = "https://youtube.en.uptodown.com/android"
+
+#[YouTube]
+#enabled = true
+#patches-version = "latest"
+#build-mode = "apk"
+#arch = "arm64-v8a"
+#included-patches = "'Hide ads' 'Video ads' 'Remove viewer discretion dialog' 'Change header' 'Hide video action buttons' 'Navigation buttons' 'Hide player overlay buttons' 'Hide end screen suggested video' 'Hide layout components' 'Hide player flyout menu items' 'Hide Shorts components' 'Disable sign in to TV popup' 'Exit fullscreen mode' 'Open videos fullscreen' 'Return YouTube Dislike' 'SponsorBlock' 'Disable resuming Shorts on startup' 'Theme' 'Remove background playback restrictions' 'GmsCore support' 'Bypass URL redirects' 'Open links externally' 'Loop video' 'Spoof video streams' 'Video quality' 'Playback speed'"
+#exclusive-patches = true
+#version = "auto"
+#archive-dlurl = "https://archive.org/download/jhc-apks/apks/com.google.android.youtube"
+#apkmirror-dlurl = "https://www.apkmirror.com/apk/google-inc/youtube/"
+#uptodown-dlurl = "https://youtube.en.uptodown.com/android"
