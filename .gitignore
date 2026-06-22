@@ -7,3 +7,6 @@ test*
 build.md
 cmpr
 *-temporary-files
+/lib
+/lib64
+pyvenv.cfg
