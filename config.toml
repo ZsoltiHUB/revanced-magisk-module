@@ -84,7 +84,7 @@ apkmirror-dlurl = "https://www.apkmirror.com/apk/intsig-pte/camscanner-phone-pdf
 uptodown-dlurl = "https://camscanner-pdf-creator.en.uptodown.com/android"
 
 [Messenger]
-enabled = true
+enabled = false
 rv-brand = "Morphe"
 cli-source = "MorpheApp/morphe-cli"
 patches-source = "RookieEnough/De-ReVanced"
