@@ -1,16 +1,18 @@
-GooglePhotos: 7.90.0.971743778  
+Music-Morphe: 9.15.51  
+Reddit-Morphe: 2026.14.0  
+YouTube-Morphe: 21.07.247  
 
 Install [Microg](https://github.com/MorpheApp/MicroG-RE/) for non-root YouTube and YT Music APKs  
 Use [zygisk-detach](https://github.com/j-hc/zygisk-detach) to detach YouTube and YT Music modules from Play Store  
 
 [revanced-magisk-module](https://github.com/j-hc/revanced-magisk-module)
   
-Patches: RookieEnough/patches-1.3.1.mpp  
-[Changelog](https://github.com/RookieEnough/De-ReVanced/releases/tag/v1.3.1)
+Patches: MorpheApp/patches-1.41.0.mpp  
+[Changelog](https://github.com/MorpheApp/morphe-patches/releases/tag/v1.41.0)
 
 CLI: MorpheApp/morphe-desktop-1.14.0-all.jar    
 
 Skipped:  
 Patches: hoo-dles/patches-1.43.0.mpp  
-Patches: crimera/patches-3.9.0.mpp  
-Patches: MorpheApp/patches-1.40.0.mpp      
+Patches: RookieEnough/patches-1.3.1.mpp  
+Patches: crimera/patches-3.9.0.mpp    
