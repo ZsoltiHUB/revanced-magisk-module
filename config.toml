@@ -8,6 +8,7 @@ dpi = "nodpi anydpi 120-640dpi"
 # you can use rvmm-config-gen to generate a config
 
 [YouTube-Morphe]
+enabled = true
 app-name = "YouTube"
 patches-source = "MorpheApp/morphe-patches"
 cli-source = "MorpheApp/morphe-cli"
@@ -59,7 +60,7 @@ uptodown-dlurl = "https://reddit-official-app.en.uptodown.com/android"
 apkmirror-dlurl = "https://www.apkmirror.com/apk/redditinc/reddit/"
 
 [Instagram-Morphe]
-enabled = true
+enabled = false
 rv-brand = "Morphe"
 patches-source = "crimera/piko"
 cli-source = "MorpheApp/morphe-cli"
